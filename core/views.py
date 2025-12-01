@@ -7,3 +7,6 @@ def healthcheck(request):
 def version(request):
     return JsonResponse({"version": "1.0.0"})
 
+def ping(request):
+    return JsonResponse({"message": "pong"})
+
