@@ -128,6 +128,13 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-IMAGEKIT_PUBLIC_KEY = "public_MAI1yA47N6pfdGowtA6qLEgbMU0="
-IMAGEKIT_PRIVATE_KEY = "private_1SaI7K43YT214mYx0y3yLXLqgvs="
-IMAGEKIT_URL_ENDPOINT = "https://ik.imagekit.io/l70kayxua"
+
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+IMAGEKIT_PUBLIC_KEY = os.getenv("IMAGEKIT_PUBLIC_KEY")
+IMAGEKIT_PRIVATE_KEY = os.getenv("IMAGEKIT_PRIVATE_KEY")
+IMAGEKIT_URL_ENDPOINT = os.getenv("IMAGEKIT_URL_ENDPOINT")
