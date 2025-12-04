@@ -3,6 +3,8 @@ drf-spectacular
 djangorestframework
 black
 imagekitio
+python-dotenv
+
 
 
 

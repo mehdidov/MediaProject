@@ -11,3 +11,7 @@ class HealthCheckSerializer(serializers.Serializer):
 
 class VersionSerializer(serializers.Serializer):
     version = serializers.CharField()
+
+
+
+
