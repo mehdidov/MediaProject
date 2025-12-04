@@ -4,6 +4,9 @@ djangorestframework
 black
 imagekitio
 python-dotenv
+psycopg2-binary
+pymongo
+
 
 
 

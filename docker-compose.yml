@@ -1,55 +1,61 @@
-# version: '3.9'
+version: "3.9"
 
 networks:
   app-network:
     driver: bridge
 
 services:
-  media-psql:
-    image: postgres:13
+  db:
+    image: postgres:14
+    env_file: 
+      - .env
     volumes:
       - ./docker_ressources/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pg_media_data:/var/lib/postgresql/data
     ports:
       - "5434:5432"
     environment:
-      POSTGRES_USER: media
-      POSTGRES_PASSWORD: media
-      POSTGRES_DB: media
+      POSTGRES_USER: ${PSQL_USER}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_DB: ${PSQL_DB}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U media"]
+      test: ["CMD-SHELL", "pg_isready -U ${PSQL_USER}"]
       interval: 1s
       timeout: 5s
-      retries: 5
+      retries: 10
     networks:
       - app-network
 
-  media-mongo:
+  mongo:
     image: mongo
-    container_name: media-mongo
+    container_name: mongo
     restart: always
+    env_file:
+      - .env
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=media
-      - MONGO_INITDB_ROOT_PASSWORD=media
+      MONGO_USER: ${M_USER}
+      MONGO_PASSWORD: ${M_PASSWORD}
     healthcheck:
-       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-       interval: 30s
-       timeout: 10s
-       retries: 5
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - app-network
 
-  media-redis:
+  redis:
     image: redis:7.4-alpine
     restart: always
-    command: redis-server --save 20 1 --loglevel warning --requirepass media
+    env_file:
+      - .env
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     healthcheck:
-       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-       interval: 30s
-       timeout: 10s
-       retries: 5
+      test: ["CMD", "redis-cli", "--raw", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     ports:
       - "6379:6379"
     volumes:
@@ -59,13 +65,18 @@ services:
 
   web:
     build: .
+    env_file:
+      - .env
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
     depends_on:
-      - media-psql
-      - media-mongo
-      - media-redis
+      db:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - app-network
     develop:
