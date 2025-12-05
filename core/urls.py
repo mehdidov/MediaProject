@@ -14,7 +14,7 @@ urlpatterns = [
     # Vérifie que le site fonctionne en retournant "status: ok"
     path("healthcheck/", HealthCheckView.as_view(), name="healthcheck"),
 
-    # Il sert à vérifier que l’API répond bien et envoie "message": "pong" si c'est le cas
+    # Il vérifie que l’API répond bien et envoie message: pong si c'est le cas
     path("ping/", PingView.as_view(), name="ping"),
 
     # Sert à envoyer un fichier vers une API comme par exemple l'upload vers ImageKit
